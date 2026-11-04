@@ -29,6 +29,29 @@ jobs:
       - name: Extract project
         run: unzip -o HackerTubeAndroid-project.zip
 
+      - name: Fix Java and Kotlin versions
+        working-directory: HackerTubeAndroid
+        run: |
+          python3 -c '
+          from pathlib import Path
+          p = Path("app/build.gradle.kts")
+          s = p.read_text()
+          s = s.replace(
+              "    defaultConfig {",
+              """    compileOptions {
+                  sourceCompatibility = JavaVersion.VERSION_17
+                  targetCompatibility = JavaVersion.VERSION_17
+              }
+
+              kotlinOptions {
+                  jvmTarget = "17"
+              }
+
+              defaultConfig {"""
+          )
+          p.write_text(s)
+          '
+
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
